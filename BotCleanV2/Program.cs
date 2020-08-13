@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BotCleanV2
 {
@@ -22,7 +23,7 @@ namespace BotCleanV2
         static void NextMove(int posr, int posc, String[] board)
         {
             var dirtyTiles = FindDirtyTiles(board);
-
+            var closestTileToClean = FindClosestDirtyTile(dirtyTiles);
         }
 
         static List<int[]> FindDirtyTiles(String[] tiles)
@@ -36,6 +37,21 @@ namespace BotCleanV2
                 }
             }
             return dirtyTiles;
+        }
+
+        static int[] FindClosestDirtyTile(List<int[]> tiles)
+        {
+            var closestTile = new int[2];
+
+            var closestRow = tiles.Select(x => x[0]).Min();
+            var closestColumn = tiles.Select(x => x[1]).Min();
+
+            var closestRowDestination = tiles.FirstOrDefault(x => x[0] == closestRow);
+            var closestColumnDestination = tiles.FirstOrDefault(x => x[1] == closestColumn);
+
+            closestTile = closestColumnDestination[0] + closestColumnDestination[1] > closestRowDestination[0] + closestRowDestination[1]
+                                     ? closestRowDestination : closestColumnDestination; //find the destination with the least amount of job; so either closest row or closest column
+            return closestTile;
         }
     }
 }
