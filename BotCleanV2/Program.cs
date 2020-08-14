@@ -8,22 +8,25 @@ namespace BotCleanV2
     {
         static void Main(string[] args)
         {
-            String temp = Console.ReadLine();
-            String[] position = temp.Split(' ');
-            int[] pos = new int[2];
-            String[] board = new String[5];
-            for (int i = 0; i < 5; i++)
-            {
-                board[i] = Console.ReadLine();
-            }
-            for (int i = 0; i < 2; i++) pos[i] = Convert.ToInt32(position[i]);
-            NextMove(pos[0], pos[1], board);
+            //String temp = Console.ReadLine();
+            //String[] position = temp.Split(' ');
+            //int[] pos = new int[2];
+            //String[] board = new String[5];
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    board[i] = Console.ReadLine();
+            //}
+            //for (int i = 0; i < 2; i++) pos[i] = Convert.ToInt32(position[i]);
+            var board = new String[] { "- - - - -", "- - - - -", "- - - - d", "- - d - -", "- - - - -" };
+            NextMove(0,0, board);
         }
 
         static void NextMove(int posr, int posc, String[] board)
         {
+            var currentPositionOfBot = new int[] { posr, posc };
             var dirtyTiles = FindDirtyTiles(board);
             var closestTileToClean = FindClosestDirtyTile(dirtyTiles);
+            
         }
 
         static List<int[]> FindDirtyTiles(String[] tiles)
@@ -31,9 +34,10 @@ namespace BotCleanV2
             var dirtyTiles = new List<int[]>();
             for (int i = 0; i < tiles.Length; i++)
             {
+                var convertedCharList = tiles[i].ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToList();
                 for (int j = 0; j < tiles.Length; j++)
                 {
-                    if (tiles[i] == "d") dirtyTiles.Add(new int[] { i, j });
+                    if (convertedCharList[j] == 'd') dirtyTiles.Add(new int[] { i, j });
                 }
             }
             return dirtyTiles;
@@ -50,7 +54,7 @@ namespace BotCleanV2
             var closestColumnDestination = tiles.FirstOrDefault(x => x[1] == closestColumn);
 
             closestTile = closestColumnDestination[0] + closestColumnDestination[1] > closestRowDestination[0] + closestRowDestination[1]
-                                     ? closestRowDestination : closestColumnDestination; //find the destination with the least amount of job; so either closest row or closest column
+                                     ? closestRowDestination : closestColumnDestination; //find the destination with the least amount of jumps; so either closest row or closest column
             return closestTile;
         }
     }
