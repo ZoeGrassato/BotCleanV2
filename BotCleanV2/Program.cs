@@ -25,8 +25,8 @@ namespace BotCleanV2
         {
             var currentPositionOfBot = new int[] { posr, posc };
             var dirtyTiles = FindDirtyTiles(board);
-            var closestTileToClean = FindClosestDirtyTile(dirtyTiles);
-            
+            var closestTileToClean = FindClosestDirtyTile(dirtyTiles, currentPositionOfBot);
+            var instruction = closestTileToClean[0] - currentPositionOfBot[0] < 0 ? "RIGHT" : "LEFT";
         }
 
         static List<int[]> FindDirtyTiles(String[] tiles)
@@ -43,7 +43,7 @@ namespace BotCleanV2
             return dirtyTiles;
         }
 
-        static int[] FindClosestDirtyTile(List<int[]> tiles)
+        static int[] FindClosestDirtyTile(List<int[]> tiles, int[] botCurrentPosition)
         {
             var closestTile = new int[2];
 
@@ -53,7 +53,14 @@ namespace BotCleanV2
             var closestRowDestination = tiles.FirstOrDefault(x => x[0] == closestRow);
             var closestColumnDestination = tiles.FirstOrDefault(x => x[1] == closestColumn);
 
-            closestTile = closestColumnDestination[0] + closestColumnDestination[1] > closestRowDestination[0] + closestRowDestination[1]
+            //BELOW: this calculates the distance between the current bot position, and both of the possible routes (closest row or closest column)
+            var currentBotPaddingRowA = Math.Abs(botCurrentPosition[0] - closestRowDestination[0]);
+            var currentBotPaddingColA = Math.Abs(botCurrentPosition[1] - closestRowDestination[1]);
+
+            var currentBotPaddingRowB = Math.Abs(botCurrentPosition[0] - closestColumnDestination[0]);
+            var currentBotPaddingColB = Math.Abs(botCurrentPosition[1] - closestColumnDestination[1]);
+
+            closestTile = currentBotPaddingRowB + currentBotPaddingColB > currentBotPaddingRowA + currentBotPaddingColA
                                      ? closestRowDestination : closestColumnDestination; //find the destination with the least amount of jumps; so either closest row or closest column
             return closestTile;
         }
