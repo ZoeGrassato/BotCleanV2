@@ -8,25 +8,23 @@ namespace BotCleanV2
     {
         static void Main(string[] args)
         {
-            //String temp = Console.ReadLine();
-            //String[] position = temp.Split(' ');
-            //int[] pos = new int[2];
-            //String[] board = new String[5];
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    board[i] = Console.ReadLine();
-            //}
-            //for (int i = 0; i < 2; i++) pos[i] = Convert.ToInt32(position[i]);
-            var board = new String[] { "- - - - -", "- - - - -", "- - - - d", "- - d - -", "- - - - -" };
-            NextMove(0,0, board);
+            var board = new String[] { "- - - d -", "- d d - -", "- - - - -", "- - - - -", "d - d - -" };
+            NextMove(0,1, board);
         }
 
         static void NextMove(int posr, int posc, String[] board)
         {
+            var instruction = "";
             var currentPositionOfBot = new int[] { posr, posc };
             var dirtyTiles = FindDirtyTiles(board);
             var closestTileToClean = FindClosestDirtyTile(dirtyTiles, currentPositionOfBot);
-            var instruction = closestTileToClean[0] - currentPositionOfBot[0] < 0 ? "RIGHT" : "LEFT";
+
+            //First move RIGHT/LEFT then DOWN/UP
+            if (currentPositionOfBot[0] - closestTileToClean[0] != 0) instruction = currentPositionOfBot[0] - closestTileToClean[0] < 0 ? "DOWN" : "UP"; //if this is equal to 0 then we are done moving rows
+            else if (currentPositionOfBot[1] - closestTileToClean[1] != 0) instruction = currentPositionOfBot[1] - closestTileToClean[1] < 0 ? "RIGHT" : "LEFT";
+            else instruction = "CLEAN";
+
+            Console.WriteLine(instruction);
         }
 
         static List<int[]> FindDirtyTiles(String[] tiles)
