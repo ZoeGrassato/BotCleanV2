@@ -8,8 +8,8 @@ namespace BotCleanV2
     {
         static void Main(string[] args)
         {
-            var board = new String[] { "- - - d -", "- d d - -", "- - - - -", "- - - - -", "d - d - -" };
-            NextMove(0,1, board);
+            var board = new String[] { "- - - - -", "- - - - -", "- - - d -", "- - - d -", "- - d - d" };
+            NextMove(1,3, board);
         }
 
         static void NextMove(int posr, int posc, String[] board)
@@ -20,9 +20,9 @@ namespace BotCleanV2
             var closestTileToClean = FindClosestDirtyTile(dirtyTiles, currentPositionOfBot);
 
             //First move RIGHT/LEFT then DOWN/UP
-            if (currentPositionOfBot[0] - closestTileToClean[0] != 0) instruction = currentPositionOfBot[0] - closestTileToClean[0] < 0 ? "DOWN" : "UP"; //if this is equal to 0 then we are done moving rows
+            if (closestTileToClean[0] == -1 && closestTileToClean[1] == -1) instruction = "CLEAN";
             else if (currentPositionOfBot[1] - closestTileToClean[1] != 0) instruction = currentPositionOfBot[1] - closestTileToClean[1] < 0 ? "RIGHT" : "LEFT";
-            else instruction = "CLEAN";
+            else if (currentPositionOfBot[0] - closestTileToClean[0] != 0) instruction = currentPositionOfBot[0] - closestTileToClean[0] < 0 ? "DOWN" : "UP"; //if this is equal to 0 then we are done moving rows
 
             Console.WriteLine(instruction);
         }
@@ -44,22 +44,25 @@ namespace BotCleanV2
         static int[] FindClosestDirtyTile(List<int[]> tiles, int[] botCurrentPosition)
         {
             var closestTile = new int[2];
+            var closestDifference = Int32.MaxValue;
 
-            var closestRow = tiles.Select(x => x[0]).Min();
-            var closestColumn = tiles.Select(x => x[1]).Min();
+            for(int i = 0; i < tiles.Count; i++)
+            {
+                var currentDistanceFromBotRow = Math.Abs(botCurrentPosition[0] - tiles[i][0]);
+                var currentDistanceFromBotCol = Math.Abs(botCurrentPosition[1] - tiles[i][1]);
 
-            var closestRowDestination = tiles.FirstOrDefault(x => x[0] == closestRow);
-            var closestColumnDestination = tiles.FirstOrDefault(x => x[1] == closestColumn);
+                if(botCurrentPosition[0] == tiles[i][0] && botCurrentPosition[1] == tiles[i][1])
+                {
+                    closestTile = new int[] { -1, -1 };
+                    return closestTile;
+                }
 
-            //BELOW: this calculates the distance between the current bot position, and both of the possible routes (closest row or closest column)
-            var currentBotPaddingRowA = Math.Abs(botCurrentPosition[0] - closestRowDestination[0]);
-            var currentBotPaddingColA = Math.Abs(botCurrentPosition[1] - closestRowDestination[1]);
-
-            var currentBotPaddingRowB = Math.Abs(botCurrentPosition[0] - closestColumnDestination[0]);
-            var currentBotPaddingColB = Math.Abs(botCurrentPosition[1] - closestColumnDestination[1]);
-
-            closestTile = currentBotPaddingRowB + currentBotPaddingColB > currentBotPaddingRowA + currentBotPaddingColA
-                                     ? closestRowDestination : closestColumnDestination; //find the destination with the least amount of jumps; so either closest row or closest column
+                if (currentDistanceFromBotRow + currentDistanceFromBotCol < closestDifference )
+                {
+                    closestDifference = currentDistanceFromBotRow + currentDistanceFromBotCol;
+                    closestTile = new int[] { tiles[i][0], tiles[i][1] };
+                }
+            }
             return closestTile;
         }
     }
